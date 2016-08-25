@@ -11,7 +11,7 @@ import java.net.URL;
  * Created by hasee on 2016/8/25.
  */
 public class HttpUtil {
-    public void sendHttpRequest(final String address, final HttpCallbackListener listener) {
+    public static void sendHttpRequest(final String address, final HttpCallbackListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -21,8 +21,8 @@ public class HttpUtil {
                     URL url = new URL(address);
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
-                    conn.setDoOutput(true);
-                    conn.setDoInput(true);
+                   // conn.setDoOutput(true);
+                  //  conn.setDoInput(true);
                     conn.setConnectTimeout(8000);
                     conn.setReadTimeout(8000);
                     InputStream in = conn.getInputStream();
