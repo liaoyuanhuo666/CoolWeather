@@ -31,7 +31,7 @@ public class ChooseAreaActivity extends AppCompatActivity {
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
     private int currentLevel;
-
+    private boolean isFromWeatherActivity;
     /**
      * 省列表
      */
@@ -64,9 +64,10 @@ public class ChooseAreaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("city_selected",false)) {
-            Intent i = new Intent(this,WeatherActivity.class);
+        if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+            Intent i = new Intent(this, WeatherActivity.class);
             startActivity(i);
             finish();
         }
@@ -86,9 +87,9 @@ public class ChooseAreaActivity extends AppCompatActivity {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCountries();
-                } else if (currentLevel==LEVEL_COUNTY) {
-                    String countyCode= countyList.get(position).getCountyCode();
-                    Intent i = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent i = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
                     i.putExtra("county_code", countyCode);
                     startActivity(i);
                     finish();
@@ -161,13 +162,13 @@ public class ChooseAreaActivity extends AppCompatActivity {
 
             @Override
             public void onFinish(String response) {
-                boolean result=false;
+                boolean result = false;
                 if (type.equals("province")) {
                     result = Utility.handleProvincesResponse(db, response);
                 } else if (type.equals("city")) {
                     result = Utility.handleCitiesResponse(db, response, selectedProvince.getId());
                 } else if (type.equals("country")) {
-                    Log.i("type",type+"---");
+                    Log.i("type", type + "---");
                     result = Utility.handleCountiesResponse(db, response, selectedCity.getId());
                 }
                 if (result) {
@@ -180,7 +181,7 @@ public class ChooseAreaActivity extends AppCompatActivity {
                             } else if ("city".equals(type)) {
                                 queryCities();
                             } else if ("county".equals(type)) {
-                                Log.i("type",type+"---22222");
+                                Log.i("type", type + "---22222");
                                 queryCountries();
                             }
                         }
@@ -219,11 +220,15 @@ public class ChooseAreaActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (currentLevel==LEVEL_COUNTY) {
+        if (currentLevel == LEVEL_COUNTY) {
             queryCities();
-        } else if (currentLevel==LEVEL_CITY) {
+        } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
-        } else if (currentLevel==LEVEL_PROVINCE) {
+        } else {
+            if (isFromWeatherActivity) {
+                Intent i = new Intent(this, WeatherActivity.class);
+                startActivity(i);
+            }
             finish();
         }
     }

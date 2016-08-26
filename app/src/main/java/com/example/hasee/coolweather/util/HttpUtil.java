@@ -1,5 +1,12 @@
 package com.example.hasee.coolweather.util;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,14 +25,25 @@ public class HttpUtil {
                 HttpURLConnection conn = null;
 
                 try {
-                    URL url = new URL(address);
+                   /* URL url = new URL(address);
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                    // conn.setDoOutput(true);
                   //  conn.setDoInput(true);
                     conn.setConnectTimeout(8000);
                     conn.setReadTimeout(8000);
-                    InputStream in = conn.getInputStream();
+                    conn.connect();*/
+
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet httpget = new HttpGet(address);
+                    HttpResponse httpresponse = client.execute(httpget);
+                    HttpEntity entity = httpresponse.getEntity();
+                    InputStream in = null;
+                    if (entity != null) {
+                        entity = new BufferedHttpEntity(entity);
+                         in = entity.getContent();
+                    }
+                  //  InputStream in = conn.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     String line;
                     StringBuilder response = new StringBuilder();
@@ -33,7 +51,6 @@ public class HttpUtil {
                         response.append(line);
                     }
                     in.close();
-                    reader.close();
                     if (listener != null) {
                         listener.onFinish(response.toString());
                     }
