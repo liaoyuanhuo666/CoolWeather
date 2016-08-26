@@ -32,6 +32,8 @@ public class HttpUtil {
                     if ((line = reader.readLine()) != null) {
                         response.append(line);
                     }
+                    in.close();
+                    reader.close();
                     if (listener != null) {
                         listener.onFinish(response.toString());
                     }

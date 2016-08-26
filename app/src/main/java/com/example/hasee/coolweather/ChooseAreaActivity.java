@@ -1,6 +1,9 @@
 package com.example.hasee.coolweather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -61,6 +64,12 @@ public class ChooseAreaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("city_selected",false)) {
+            Intent i = new Intent(this,WeatherActivity.class);
+            startActivity(i);
+            finish();
+        }
         setContentView(R.layout.choose_area);
         title = (TextView) findViewById(R.id.title_text);
         listView = (ListView) findViewById(R.id.list_view);
@@ -75,9 +84,14 @@ public class ChooseAreaActivity extends AppCompatActivity {
                     selectedProvince = provinceList.get(position);
                     queryCities();
                 } else if (currentLevel == LEVEL_CITY) {
-
                     selectedCity = cityList.get(position);
                     queryCountries();
+                } else if (currentLevel==LEVEL_COUNTY) {
+                    String countyCode= countyList.get(position).getCountyCode();
+                    Intent i = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                    i.putExtra("county_code", countyCode);
+                    startActivity(i);
+                    finish();
                 }
             }
         });
@@ -129,7 +143,6 @@ public class ChooseAreaActivity extends AppCompatActivity {
             title.setText(selectedCity.getCityName());
             currentLevel = LEVEL_COUNTY;
         } else {
-            Log.i("ChooseAreaActivity","----"+countyList.size());
             queryFromServer(selectedCity.getCityCode(), "country");
         }
     }
